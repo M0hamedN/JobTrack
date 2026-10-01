@@ -1,0 +1,201 @@
+{% extends "index.html" %}
+{% block title %} Main {% endblock %}
+{% block body %}
+{% include "flash.html" %}
+<header class="container-fluid px-3 pt-4 pb-3 border-bottom mb-3">
+  <div class="d-flex flex-sm-row justify-content-between align-items-sm-center gap-2">
+    <div>
+      <h1 class="h3 mb-1">Job Applications</h1>
+      <p class="text-body-secondary mb-0">Username: {{ username }}</p>
+    </div>
+    <div>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-application-modal">+ Add application</button>
+      <a href="/logout" class="btn btn-danger">Logout</a>
+    </div>
+  </div>
+</header>
+<div class="modal fade" id="add-application-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1>Add a job application</h1>
+      </div>
+      <div class="modal-body">
+        <!-- I need to ask for job-title, job-url, location, status (dropdown menu), notes -->
+        <form action="/Add_application" method="POST" class="d-flex flex-column gap-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="form-floating">
+            <input autocomplete="off" class="form-control" name="job_title" id="job_title" type="text" placeholder="Job title" required>
+            <label for="job_title">Job title</label>
+          </div>
+          <div class="form-floating">
+            <input autocomplete="off" class="form-control" name="job_url" id="job_url" type="text" placeholder="Job url" required>
+            <label for="job_url">Job url</label>
+          </div>
+          <div class="form-floating">
+            <input autocomplete="off" class="form-control" name="company" id="company" type="text" placeholder="Company name" required>
+            <label for="company">Company name</label>
+          </div>
+          <div class="form-floating">
+            <input autocomplete="off" class="form-control" name="company_url" id="company_url" type="text" placeholder="Company url" required>
+            <label for="company_url">Company url</label>
+          </div>
+          <div class="form-floating">
+            <input autocomplete="off" class="form-control" name="location" id="location" type="text" placeholder="Location" required>
+            <label for="location">Location</label>
+          </div>
+          <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select id="status" name="status" class="form-select">
+              <option value="" selected disabled>Choose a status...</option>
+              <option value="saved">Saved</option>
+              <option value="applied">Applied</option>
+              <option value="phone_screen">Phone screen</option>
+              <option value="interview">Interview</option>
+              <option value="offer">Offer</option>
+              <option value="rejected">Rejected</option>
+              <option value="withdrawn">Withdrawn</option>
+              <option value="accepted">Accepted</option>
+            </select>
+          </div>
+          <div class="form-floating">
+            <input autocomplete="off" class="form-control" name="notes" id="notes" type="text" placeholder="Notes" required>
+            <label for="notes">Notes</label>
+          </div>
+          <button class="btn btn-primary" type="submit">submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="remove-application-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1>Delete application?</h1>
+      </div>
+      <div class="modal-body">
+        <span class="mb-2">This action is irreversible.</span>
+        <form class="mt-2" action="/Delete_application" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="application_id" id="delete-application-id">
+          <button class="btn btn-danger">Delete application</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"> Close </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="update-status-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1>Update application Status</h1>
+      </div>
+      <div class="modal-body">
+        <form action="/Update_status" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="application_id" id="update-application-id">
+          <span>New status: </span>
+          <div>
+            <label for="status" class="form-label">Status</label>
+            <select id="status" name="status" class="form-select">
+              <option value="" selected disabled>Update status...</option>
+              <option value="saved">Saved</option>
+              <option value="applied">Applied</option>
+              <option value="phone_screen">Phone screen</option>
+              <option value="interview">Interview</option>
+              <option value="offer">Offer</option>
+              <option value="rejected">Rejected</option>
+              <option value="withdrawn">Withdrawn</option>
+              <option value="accepted">Accepted</option>
+            </select>
+          </div>
+          <button class="btn btn-primary">Save changes</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="d-flex flex-column gap-3 p-3">
+{% for statuses, label in [
+    (("saved",), "Saved"),
+    (("applied",), "Applied"),
+    (("interview", "phone_screen"), "Interview process"),
+    (("offer",), "Offer"),
+    (("rejected",), "Rejected"),
+    (("accepted",), "Accepted")
+    ] %}
+    {% set count = applications | selectattr("status", "in", statuses) | list | length %}
+    {% set slug = label | lower | replace(" ", "_") %}
+    <section class="flex-lg-fill bg-light rounded p-2" style="min-width: 0;">
+      <h6 class="mb-0">
+        <button class="btn w-100 d-flex justify-content-between align-items-center text-uppercase fw-semibold p-1" data-bs-toggle="collapse" data-bs-target="#col-{{ slug }}" aria-expanded="true" aria-controls="col-{{ slug }}">
+        {{ label }} <span class="badge text-bg-secondary">{{ count }}</span>
+      </button>
+      <!-- Desktop-only static title -->
+      <span class="d-none justify-content-between text-uppercase fw-semibold p-1">
+        {{ label }} <span class="badge text-bg-secondary">{{ count }}</span>
+      </span>
+    </h6>
+    <div id="col-{{ slug }}" class="collapse show mt-2">
+      <div class="d-inline-flex flex-row flex-wrap gap-3">
+        {% for row in applications if row.status in statuses %}
+        <div class="card mb-2" style="max-width: 500px;">
+          <div class="card-body p-2" style="position: relative;">
+            <p>Position: {{ row["job_title"] }}</p>
+            <p>Job Url: {{ row["job_url"] }}</p>
+            <p>Location: {{ row["location"] }}</p>
+            <div class="d-flex align-items-center justify-content-between">
+              <p>status: {{ row["status"] }}</p>
+              <button class="btn btn-primary btn-sm" data-application-id="{{ row['id'] }}" data-bs-target="#update-status-modal" data-bs-toggle="modal">Update status</button>
+            </div>
+            <form method="POST" action="/Update_notes" class="d-flex align-items-center gap-3">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="id" value="{{ row['id'] }}">
+              <input style="min-width: 300px;" type="text" autocomplete="off" name="notes" id="notes" value="{{ row['notes'] | default('', true) }}" placeholder="Nothing here yet">
+              <button class="btn btn-sm btn-primary" type="submit">Update notes</button>
+            </form>
+            <button class="btn btn-danger btn-sm" data-application-id="{{ row['id'] }}" style="position: absolute; top: 5px; right: 5px;" data-bs-target="#remove-application-modal" data-bs-toggle="modal">Delete</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endfor %}
+</div>
+<!-- Companies -->
+<section class="p-3">
+  <h2 class="h5 mb-3">Companies</h2>
+  <div class="d-flex flex-column flex-md-row flex-wrap gap-3">
+    {% for company in companies %}
+    <div class="card p-3 d-inline-flex align-items-center justify-content-center" style="min-width: 280px; max-width: 350px;">
+      <span>{{company["name"]}}</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+<script>
+    const deleteModal = document.getElementById("remove-application-modal");
+    deleteModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
+        const applicationId = button.getAttribute("data-application-id");
+        document.getElementById("delete-application-id").value = applicationId;
+    });
+
+    const updateStatusModal = document.getElementById("update-status-modal");
+    updateStatusModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
+        const applicationId = button.getAttribute("data-application-id");
+        document.getElementById("update-application-id").value = applicationId;
+    });
+</script>
+{% endblock %}

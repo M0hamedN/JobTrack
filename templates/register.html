@@ -1,0 +1,128 @@
+{% extends "index.html" %}
+
+{% block title %} Register {% endblock %}
+
+{% block body %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm-password');
+
+    function createFeedback(input) {
+        const div = document.createElement('div');
+        div.className = 'form-text';
+        input.closest('.form-floating').insertAdjacentElement('afterend', div);
+        return div;
+    }
+
+    const usernameFeedback = createFeedback(usernameInput);
+    const passwordFeedback = createFeedback(passwordInput);
+    const confirmFeedback = createFeedback(confirmInput);
+
+    function setFeedback(el, input, message, isValid) {
+        el.textContent = message;
+        el.style.color = isValid ? 'green' : 'crimson';
+        input.classList.toggle('is-valid', isValid);
+        input.classList.toggle('is-invalid', !isValid);
+    }
+
+    function validateUsername() {
+        const value = usernameInput.value.trim();
+        const lengthOk = value.length >= 8 && value.length <= 20;
+        const charsOk = /^[A-Za-z0-9_]*$/.test(value);
+
+        if (!lengthOk) {
+            setFeedback(usernameFeedback, usernameInput, 'Username must be 8–20 characters', false);
+            return false;
+        }
+        if (!charsOk) {
+            setFeedback(usernameFeedback, usernameInput, 'Only letters, numbers, and underscores allowed', false);
+            return false;
+        }
+        setFeedback(usernameFeedback, usernameInput, 'Looks good', true);
+        return true;
+    }
+
+    function validatePassword() {
+        const value = passwordInput.value;
+        const checks = [
+            { ok: value.length >= 8, msg: 'at least 8 characters' },
+            { ok: /[A-Z]/.test(value), msg: 'an uppercase letter' },
+            { ok: /[a-z]/.test(value), msg: 'a lowercase letter' },
+            { ok: /[0-9]/.test(value), msg: 'a number' },
+            { ok: /[!@#$%^&*(),.?":{}|<>_\-+=]/.test(value), msg: 'a special character' },
+        ];
+
+        const failed = checks.filter(c => !c.ok);
+
+        if (failed.length > 0) {
+            setFeedback(passwordFeedback, passwordInput, 'Missing: ' + failed.map(c => c.msg).join(', '), false);
+            return false;
+        }
+        setFeedback(passwordFeedback, passwordInput, 'Strong password', true);
+        return true;
+    }
+
+    function validateConfirm() {
+        const matches = confirmInput.value.length > 0 && confirmInput.value === passwordInput.value;
+        setFeedback(confirmFeedback, confirmInput, matches ? 'Passwords match' : 'Passwords do not match', matches);
+        return matches;
+    }
+
+    usernameInput.addEventListener('input', validateUsername);
+    passwordInput.addEventListener('input', function () {
+        validatePassword();
+        if (confirmInput.value) validateConfirm();
+    });
+    confirmInput.addEventListener('input', validateConfirm);
+
+    form.addEventListener('submit', function (e) {
+        const validUsername = validateUsername();
+        const validPassword = validatePassword();
+        const validConfirm = validateConfirm();
+
+        if (!validUsername || !validPassword || !validConfirm) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+
+{% include "flash.html" %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="d-flex flex-column gap-3 justify-content-center align-content-center" 
+    style="width: 100%; max-width: 400px;">
+        <form action="/register" method="post" class="d-flex flex-column gap-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <h2>Register an account</h2>
+            <div class="form-floating">
+                <input autocomplete="off" autofocus class="form-control" 
+                    name="email" id="email" type="email" placeholder="Email" required>
+                    <label for="email">Email</label>
+                </div>
+                <div class="form-floating">
+                    <input type="text" class="form-control" 
+                    name="username" id="username" placeholder="Username" required>
+                    <label for="username">Username</label>
+                </div>
+                <div class="form-floating">
+                    <input type="password" class="form-control" 
+                    name="password" id="password" placeholder="Password" required>
+                    <label for="password">Password</label>
+                </div>
+                <div class="form-floating">
+                    <input type="password" class="form-control" 
+                    name="confirm-password" id="confirm-password" placeholder="Confirm password" required>
+                    <label for="confirm-password">Confirm password</label>
+                </div>
+                <button class="btn btn-primary" type="submit">register</button>
+            <p>Already have an account? <a href="/login">Login</a></p>
+        </form>
+    </div>
+</div>
+
+
+
+{% endblock %}

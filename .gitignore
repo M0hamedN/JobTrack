@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+flask_session/
+.env
+jobtrack.db
+sq.sql
