@@ -51,9 +51,74 @@
 
 
     <div class="btn-group d-flex justify-content-center mt-4">
-        <button class="btn btn-dark">Change password</button>
+        <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#change-password-modal">Change password</button>
         <button class="btn btn-danger">Delete account</button>
     </div>
 </div>
+
+<div class="modal fade" id="change-password-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Change Password</h2>
+            </div>
+            <div class="modal-body">
+                <form action="/Change_password" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-floating">
+                        <input type="password" class="form-control" 
+                        name="new_password" id="new-password" placeholder="New password" required>
+                        <label for="new_password">New password</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="password" class="form-control" 
+                        name="confirm-password" id="confirm-password" placeholder="Confirm password" required>
+                        <label for="confirm-password">Confirm password</label>
+                    </div>
+                    <button class="btn btn-primary mt-3">Change Password</button> 
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    newPasswordInput = document.getElementById('new-password')
+    confirmInput = document.getElementById('confirm-password')
+
+    function createFeedback(input) {
+        const div = document.createElement('div');
+        div.className = 'form-text';
+        input.closest('.form-floating').insertAdjacentElement('afterend', div);
+        return div;
+    }
+
+    const passwordFeedback = createFeedback(newPasswordInput);
+    const confirmFeedback = createFeedback(confirmInput);
+
+    function setFeedback(el, input, message, isValid) {
+        el.textContent = message;
+        el.style.color = isValid ? 'green' : 'crimson';
+        input.classList.toggle('is-valid', isValid);
+        input.classList.toggle('is-invalid', !isValid);
+    }
+
+    function validateConfirm() {
+        const matches = confirmInput.value.length > 0 && confirmInput.value === newPasswordInput.value;
+        setFeedback(confirmFeedback, confirmInput, matches ? 'Passwords match' : 'Passwords do not match', matches);
+        return matches;
+    }
+
+    form.addEventListener('submit', function (e) {
+        const validConfirm = validateConfirm();
+
+        if (!validConfirm) {
+            e.preventDefault();
+        }
+    });
+</script>
 
 {% endblock %}

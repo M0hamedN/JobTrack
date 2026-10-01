@@ -73,16 +73,31 @@ def main():
     return render_template("main.html")
 
 
-@app.route('/Account', methods=["GET", "POST"])
+@app.route('/Account')
 @login_required
 def account():
-    if request.method == "GET":
-        user = db.execute("SELECT email, username, created_at FROM users WHERE id == ?", session["user_id"])
-        job_titles = db.execute("SELECT job_title FROM applications WHERE user_id = ?", session["user_id"])
-        applications_count = len(job_titles)
-        companies = db.execute("SELECT companies.name FROM applications JOIN companies ON applications.company_id = companies.id WHERE applications.user_id = ? GROUP BY companies.name", session["user_id"])
-        print(companies)
-        return render_template("account.html", user=user[0], job_titles=job_titles, count=applications_count, companies=companies)
+    user = db.execute("SELECT email, username, created_at FROM users WHERE id == ?", session["user_id"])
+    job_titles = db.execute("SELECT job_title FROM applications WHERE user_id = ?", session["user_id"])
+    applications_count = len(job_titles)
+    companies = db.execute("SELECT companies.name FROM applications JOIN companies ON applications.company_id = companies.id WHERE applications.user_id = ? GROUP BY companies.name", session["user_id"])
+    print(companies)
+    return render_template("account.html", user=user[0], job_titles=job_titles, count=applications_count, companies=companies)
+
+@app.route('/Change_password', methods=["POST"])
+@login_required
+def change_password():
+    new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm-password')
+    print(new_password, confirm_password)
+
+    if new_password != confirm_password:
+        flash("Confirm password does not match")
+        return redirect('/Account')
+
+    new_password_hash = generate_password_hash(new_password)
+
+    db.execute("UPDATE users SET password_hash = ? WHERE id = ?", new_password_hash, session["user_id"])
+    return redirect('/logout')
 
 
 @app.route('/Update_status', methods=["POST"])
@@ -263,10 +278,6 @@ def register():
         flash("Account successfully registered")
         return redirect("/login")
 
-
-@app.route('/dev')
-def dev():
-    return render_template("dev.html")
 
 
 if __name__ == "__main__":
