@@ -83,7 +83,7 @@ def account():
     print(companies)
     return render_template("account.html", user=user[0], job_titles=job_titles, count=applications_count, companies=companies)
 
-@app.route('/delete_account')
+@app.route('/delete_account', methods=["POST"])
 @login_required
 def delete_account():
     db.execute("DELETE FROM users WHERE id = ?", session["user_id"])
