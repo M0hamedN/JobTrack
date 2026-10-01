@@ -10,7 +10,27 @@
         <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     </head>
     <body>  
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">JobTrack</a>
+
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="/">Main</a>
+                    <a class="nav-link" href="/Account">Account</a>
+                </div>
+            </div>
+        </nav>
         {% block body %}
         {% endblock %}
+
+        <script>
+            const navLinks = document.querySelectorAll('.nav-link')
+
+            navLinks.forEach(link => {
+                if (link.href === window.location.href){
+                    link.classList.add('active')
+                }
+            })
+        </script>
     </body>
 </html>

@@ -1,0 +1,59 @@
+{% extends "index.html" %}
+{% block title %} Account {% endblock %}
+{% block body %}
+{% include "flash.html" %}
+<style>
+#job-title{
+    max-width: 200px;
+    min-width: 150px;
+    width: 70%;
+    height: 30px;
+    border-radius: 10px;
+}
+#company{
+    max-width: 200px;
+    min-width: 150px;
+    width: 70%;
+    height: 30px;
+    border-radius: 10px;
+}
+
+.btn{
+    max-width: 500px;
+}
+</style>
+
+<!-- username, ability to change password, companies applied to, number of applications submitted, job titles, ability to delete account -->
+<div class="p-4 text-black d-flex flex-column">
+    <h2>Username: {{ user["username"] }}</h2>
+    <h2>Email: {{ user["email"] }}</h2>
+    <span style="font-size: 20px;">applications submitted: {{ count }}</span>
+    <div class="d-flex gap-3 flex-row flex-wrap" style="border-top: solid black 1px; margin-top: 20px; padding-top: 20px;">
+        <h3 style="width: 30%; min-width: 30px;">Job titles:</h3>
+        {% for title in job_titles %}
+        <div>
+            <div id="job-title" class="d-flex bg-light align-items-center justify-content-center">
+                <p class="mb-0">{{ title["job_title"] }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="d-flex gap-3 flex-row flex-wrap">
+        <h3 style="width: 30%; min-width: 30px;">Companies applied to:</h3>
+        {% for company in companies %}
+        <div>
+            <div id="company" class="d-flex text-black bg-light align-items-center justify-content-center">
+                <p class="mb-0">{{ company["name"] }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+    <div class="btn-group d-flex justify-content-center mt-4">
+        <button class="btn btn-dark">Change password</button>
+        <button class="btn btn-danger">Delete account</button>
+    </div>
+</div>
+
+{% endblock %}

@@ -72,6 +72,19 @@ def main():
 
     return render_template("main.html")
 
+
+@app.route('/Account', methods=["GET", "POST"])
+@login_required
+def account():
+    if request.method == "GET":
+        user = db.execute("SELECT email, username, created_at FROM users WHERE id == ?", session["user_id"])
+        job_titles = db.execute("SELECT job_title FROM applications WHERE user_id = ?", session["user_id"])
+        applications_count = len(job_titles)
+        companies = db.execute("SELECT companies.name FROM applications JOIN companies ON applications.company_id = companies.id WHERE applications.user_id = ? GROUP BY companies.name", session["user_id"])
+        print(companies)
+        return render_template("account.html", user=user[0], job_titles=job_titles, count=applications_count, companies=companies)
+
+
 @app.route('/Update_status', methods=["POST"])
 @login_required
 def update_status():
@@ -258,33 +271,3 @@ def dev():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
-    # if request.method == "GET":
-    #     rows = db.execute("SELECT job_title, job_url, location, status, applied_date, notes FROM applications WHERE user_id == ?", session["user_id"])
-    #     saved = []
-    #     applied = []
-    #     interview_process = []
-    #     offer = []
-    #     rejected = []
-    #     withdrawn = []
-    #     accepted = []
-    #     for row in rows:
-    #         if row["status"] == 'saved':
-    #             saved.append(row)
-    #         elif row["status"] == 'applied':
-    #             applied.append(row)
-    #         elif row["status"] == 'phone_screen' or row["status"] == 'interview':
-    #             interview_process.append(row)
-    #         elif row["status"] == 'offer':
-    #             offer.append(row)
-    #         elif row["status"] == 'rejected':
-    #             rejected.append(row)
-    #         elif row["status"] == 'withdrawn':
-    #             withdrawn.append(row)
-    #         elif row["status"] == 'accepted':
-    #             accepted.append(row)
-    #         else:
-    #             flash('unexpected error')
-    #             return redirect('/')
-
-    #     return render_template('main.html', saved=saved, applied=applied, interview_process=interview_process, 
-    #                            offer=offer, rejected=rejected, withdrawn=withdrawn, accepted=accepted)
