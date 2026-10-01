@@ -22,56 +22,34 @@ csrf = CSRFProtect(app)
 db = SQL("sqlite:///jobtrack.db")
 
 
-@app.route('/', methods=["POST", "GET"])
+@app.route('/')
 @login_required
 def main():
+    user = db.execute(
+        "SELECT username, id FROM users WHERE id = ?",
+        session["user_id"]
+    )[0]
 
-    if request.method == "POST":
-        if "notes" in request.form:
-            
+    applications = db.execute(
+        "SELECT id, job_title, job_url, location, status, applied_date, notes "
+        "FROM applications WHERE user_id = ?",
+        session["user_id"]
+    )
 
-            return redirect("/")
+    companies = db.execute(
+        "SELECT name, url FROM companies "
+        "WHERE id IN "
+        "(SELECT company_id FROM applications WHERE user_id = ?)",
+        session["user_id"]
+    )
 
-        elif "application_id" in request.form:
-            application_id = request.form.get("application_id")
-
-            db.execute(
-                "DELETE FROM applications WHERE id = ? AND user_id = ?",
-                application_id,
-                session["user_id"]
-            )
-
-            return redirect("/")
-
-    if request.method == "GET":
-        user = db.execute(
-            "SELECT username, id FROM users WHERE id = ?",
-            session["user_id"]
-        )[0]
-
-        applications = db.execute(
-            "SELECT id, job_title, job_url, location, status, applied_date, notes "
-            "FROM applications WHERE user_id = ?",
-            session["user_id"]
-        )
-
-        companies = db.execute(
-            "SELECT name, url FROM companies "
-            "WHERE id IN "
-            "(SELECT company_id FROM applications WHERE user_id = ?)",
-            session["user_id"]
-        )
-
-        return render_template(
-            "main.html",
-            applications=applications,
-            username=user["username"],
-            user_id=user["id"],
-            companies=companies
-        )
-
-    return render_template("main.html")
-
+    return render_template(
+        "main.html",
+        applications=applications,
+        username=user["username"],
+        user_id=user["id"],
+        companies=companies
+    )
 
 @app.route('/account')
 @login_required

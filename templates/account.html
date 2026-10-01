@@ -127,18 +127,42 @@
         input.classList.toggle('is-invalid', !isValid);
     }
 
+    function validatePassword() {
+        const value = newPasswordInput.value;
+        const checks = [
+            { ok: value.length >= 8, msg: 'at least 8 characters' },
+            { ok: /[A-Z]/.test(value), msg: 'an uppercase letter' },
+            { ok: /[a-z]/.test(value), msg: 'a lowercase letter' },
+            { ok: /[0-9]/.test(value), msg: 'a number' },
+            { ok: /[!@#$%^&*(),.?":{}|<>_\-+=]/.test(value), msg: 'a special character' },
+        ];
+
+        const failed = checks.filter(c => !c.ok);
+
+        if (failed.length > 0) {
+            setFeedback(passwordFeedback, newPasswordInput, 'Missing: ' + failed.map(c => c.msg).join(', '), false);
+            return false;
+        }
+        setFeedback(passwordFeedback, newPasswordInput, 'Strong password', true);
+        return true;
+    }
+
     function validateConfirm() {
         const matches = confirmInput.value.length > 0 && confirmInput.value === newPasswordInput.value;
         setFeedback(confirmFeedback, confirmInput, matches ? 'Passwords match' : 'Passwords do not match', matches);
         return matches;
     }
 
+    newPasswordInput.addEventListener('input', validatePassword)
+    newPasswordInput.addEventListener('input', validateConfirm)
+    confirmInput.addEventListener('input', validateConfirm)
+
     const form = document.getElementById('change-password-form');
 
     form.addEventListener('submit', function (e) {
         const validConfirm = validateConfirm();
-
-        if (!validConfirm) {
+        const validPassword = validatePassword();
+        if (!validConfirm || !validPassword) {
             e.preventDefault();
         }
     });
