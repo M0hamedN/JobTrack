@@ -58,7 +58,6 @@ def account():
     job_titles = db.execute("SELECT job_title FROM applications WHERE user_id = ?", session["user_id"])
     applications_count = len(job_titles)
     companies = db.execute("SELECT companies.name FROM applications JOIN companies ON applications.company_id = companies.id WHERE applications.user_id = ? GROUP BY companies.name", session["user_id"])
-    print(companies)
     return render_template("account.html", user=user[0], job_titles=job_titles, count=applications_count, companies=companies)
 
 @app.route('/delete_account', methods=["POST"])
@@ -73,8 +72,6 @@ def delete_account():
 def change_password():
     new_password = request.form.get('new_password')
     confirm_password = request.form.get('confirm-password')
-    print(new_password, confirm_password)
-
     if new_password != confirm_password:
         flash("Confirm password does not match")
         return redirect('/Account')
