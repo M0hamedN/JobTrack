@@ -19,7 +19,7 @@
 }
 
 .btn{
-    max-width: 500px;
+    max-width: 300px;
 }
 </style>
 
@@ -51,8 +51,9 @@
 
 
     <div class="btn-group d-flex justify-content-center mt-4">
+        <a href="/logout" class="btn btn-light" style="border: 1px black solid;">Logout</a>
         <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#change-password-modal">Change password</button>
-        <button class="btn btn-danger">Delete account</button>
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete-account-modal">Delete account</button>
     </div>
 </div>
 
@@ -77,6 +78,23 @@
                     </div>
                     <button class="btn btn-primary mt-3">Change Password</button> 
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="delete-account-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Delete account?</h2>
+            </div>
+            <div class="modal-body">
+                <p>This action is not reversible</p>
+                <a href="/Delete_account" class="btn btn-danger mt-3" style="max-width: 250px;">Delete account</a>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
