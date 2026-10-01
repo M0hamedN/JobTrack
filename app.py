@@ -73,7 +73,7 @@ def main():
     return render_template("main.html")
 
 
-@app.route('/Account')
+@app.route('/account')
 @login_required
 def account():
     user = db.execute("SELECT email, username, created_at FROM users WHERE id == ?", session["user_id"])
@@ -83,14 +83,14 @@ def account():
     print(companies)
     return render_template("account.html", user=user[0], job_titles=job_titles, count=applications_count, companies=companies)
 
-@app.route('/Delete_account')
+@app.route('/delete_account')
 @login_required
 def delete_account():
     db.execute("DELETE FROM users WHERE id = ?", session["user_id"])
     session.clear()
     return redirect('/login')
 
-@app.route('/Change_password', methods=["POST"])
+@app.route('/change_password', methods=["POST"])
 @login_required
 def change_password():
     new_password = request.form.get('new_password')
@@ -107,7 +107,7 @@ def change_password():
     return redirect('/logout')
 
 
-@app.route('/Update_status', methods=["POST"])
+@app.route('/update_status', methods=["POST"])
 @login_required
 def update_status():
     new_status = request.form.get('status')
@@ -126,7 +126,7 @@ def update_status():
     
     return redirect('/')
 
-@app.route('/Update_notes', methods=["POST"])
+@app.route('/update_notes', methods=["POST"])
 @login_required
 def update_notes():
     application_id = request.form.get("id")
@@ -140,7 +140,7 @@ def update_notes():
     )
     return redirect('/')
 
-@app.route('/Add_application', methods=["POST"])
+@app.route('/add_application', methods=["POST"])
 @login_required
 def add_application():
     job_title = request.form.get("job_title")
@@ -184,7 +184,7 @@ def add_application():
     return redirect('/')
 
 
-@app.route('/Delete_application', methods=["POST"])
+@app.route('/delete_application', methods=["POST"])
 @login_required
 def delete_application():
     application_id = request.form.get("application_id")
