@@ -64,7 +64,7 @@
                 <h2>Change Password</h2>
             </div>
             <div class="modal-body">
-                <form action="/Change_password" method="POST">
+                <form action="/change_password" id="change-password-form" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="form-floating">
                         <input type="password" class="form-control" 
@@ -94,7 +94,7 @@
             </div>
             <div class="modal-body">
                 <p>This action is not reversible</p>
-                <a href="/Delete_account" class="btn btn-danger mt-3" style="max-width: 250px;">Delete account</a>
+                <a href="/delete_account" class="btn btn-danger mt-3" style="max-width: 250px;">Delete account</a>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
@@ -104,8 +104,8 @@
 </div>
 
 <script>
-    newPasswordInput = document.getElementById('new-password')
-    confirmInput = document.getElementById('confirm-password')
+    const newPasswordInput = document.getElementById('new-password')
+    const confirmInput = document.getElementById('confirm-password')
 
     function createFeedback(input) {
         const div = document.createElement('div');
@@ -129,6 +129,8 @@
         setFeedback(confirmFeedback, confirmInput, matches ? 'Passwords match' : 'Passwords do not match', matches);
         return matches;
     }
+
+    const form = document.getElementById('change-password-form');
 
     form.addEventListener('submit', function (e) {
         const validConfirm = validateConfirm();

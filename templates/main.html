@@ -22,7 +22,7 @@
       </div>
       <div class="modal-body">
         <!-- I need to ask for job-title, job-url, location, status (dropdown menu), notes -->
-        <form action="/Add_application" method="POST" class="d-flex flex-column gap-3">
+        <form action="/add_application" method="POST" class="d-flex flex-column gap-3">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="form-floating">
             <input autocomplete="off" class="form-control" name="job_title" id="job_title" type="text" placeholder="Job title" required>
@@ -76,7 +76,7 @@
       </div>
       <div class="modal-body">
         <span class="mb-2">This action is irreversible.</span>
-        <form class="mt-2" action="/Delete_application" method="POST">
+        <form class="mt-2" action="/delete_application" method="POST">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="application_id" id="delete-application-id">
           <button class="btn btn-danger">Delete application</button>
@@ -95,7 +95,7 @@
         <h1>Update application Status</h1>
       </div>
       <div class="modal-body">
-        <form action="/Update_status" method="POST">
+        <form action="/update_status" method="POST">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="application_id" id="update-application-id">
           <span>New status: </span>
@@ -157,7 +157,7 @@
               <p>status: {{ row["status"] }}</p>
               <button class="btn btn-primary btn-sm" data-application-id="{{ row['id'] }}" data-bs-target="#update-status-modal" data-bs-toggle="modal">Update status</button>
             </div>
-            <form method="POST" action="/Update_notes" class="d-flex align-items-center gap-3">
+            <form method="POST" action="/update_notes" class="d-flex align-items-center gap-3">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <input type="hidden" name="id" value="{{ row['id'] }}">
               <input style="min-width: 300px;" type="text" autocomplete="off" name="notes" id="notes" value="{{ row['notes'] | default('', true) }}" placeholder="Nothing here yet">
